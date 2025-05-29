@@ -146,3 +146,4 @@
 /home/jlwxd/Documents/core-service/CoreService/obj/Debug/net9.0/CoreService.pdb
 /home/jlwxd/Documents/core-service/CoreService/obj/Debug/net9.0/CoreService.genruntimeconfig.cache
 /home/jlwxd/Documents/core-service/CoreService/obj/Debug/net9.0/ref/CoreService.dll
+/home/jlwxd/Documents/core-service/CoreService/obj/Debug/net9.0/CoreService.sourcelink.json
