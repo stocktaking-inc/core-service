@@ -30,7 +30,9 @@ namespace CoreService.Controllers
                     Category = x.Category,
                     Quantity = x.Quantity,
                     LocationId = x.LocationId,
-                    Status = x.Status,
+                    Status = x.Status == Item.StatusType.InStock ? "In Stock" :
+                             x.Status == Item.StatusType.OutOfStock ? "Out of Stock" :
+                             x.Status == Item.StatusType.LowStock ? "Low Stock" : "Out of Stock",
                     SupplierId = x.SupplierId
                 })
                 .ToListAsync();
@@ -60,8 +62,8 @@ namespace CoreService.Controllers
                 Article = itemDTO.Article,
                 Category = itemDTO.Category,
                 Quantity = itemDTO.Quantity,
-                LocationId = itemDTO.LocationId,  // Now accepts nullable
-                Status = itemDTO.Status,
+                LocationId = itemDTO.LocationId,
+                Status = ConvertToStatusType(itemDTO.Status), // Преобразование строки в StatusType
                 SupplierId = itemDTO.SupplierId
             };
 
@@ -90,8 +92,8 @@ namespace CoreService.Controllers
             item.Article = itemDTO.Article;
             item.Category = itemDTO.Category;
             item.Quantity = itemDTO.Quantity;
-            item.LocationId = itemDTO.LocationId;  // Now handles nullable
-            item.Status = itemDTO.Status;
+            item.LocationId = itemDTO.LocationId;
+            item.Status = ConvertToStatusType(itemDTO.Status); // Преобразование строки в StatusType
             item.SupplierId = itemDTO.SupplierId;
 
             try
@@ -142,9 +144,20 @@ namespace CoreService.Controllers
                 Article = item.Article,
                 Category = item.Category,
                 Quantity = item.Quantity,
-                LocationId = item.LocationId,  // Now handles nullable
-                Status = item.Status,
+                LocationId = item.LocationId,
+                Status = item.Status == Item.StatusType.InStock ? "In Stock" :
+                         item.Status == Item.StatusType.OutOfStock ? "Out of Stock" :
+                         item.Status == Item.StatusType.LowStock ? "Low Stock" : "Out of Stock",
                 SupplierId = item.SupplierId
+            };
+
+        private static Item.StatusType ConvertToStatusType(string status) =>
+            status switch
+            {
+                "In Stock" => Item.StatusType.InStock,
+                "Out of Stock" => Item.StatusType.OutOfStock,
+                "Low Stock" => Item.StatusType.LowStock,
+                _ => Item.StatusType.OutOfStock // Значение по умолчанию
             };
     }
 }

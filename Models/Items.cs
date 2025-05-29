@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 
 namespace CoreService.Models;
 
@@ -32,7 +33,7 @@ public class Item
 
     [ForeignKey("Location")]
     [Column("location")]
-    public int? LocationId { get; set; }  // Made nullable to match your SQL data
+    public int? LocationId { get; set; }
 
     public Warehouse? Location { get; set; }
 
@@ -47,13 +48,11 @@ public class Item
 
     public enum StatusType
     {
-        [Display(Name = "In Stock")]
+        [EnumMember(Value = "In Stock")]
         InStock,
-
-        [Display(Name = "Out of Stock")]
+        [EnumMember(Value = "Out of Stock")]
         OutOfStock,
-
-        [Display(Name = "Low Stock")]
+        [EnumMember(Value = "Low Stock")]
         LowStock
     }
 }

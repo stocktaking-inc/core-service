@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "/home/jlwxd/Documents/core-service/CoreService/CoreService.csproj": {}
+    "C:\\Users\\chouqe\\Desktop\\stock.core\\core-service\\CoreService.csproj": {}
   },
   "projects": {
-    "/home/jlwxd/Documents/core-service/CoreService/CoreService.csproj": {
+    "C:\\Users\\chouqe\\Desktop\\stock.core\\core-service\\CoreService.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/jlwxd/Documents/core-service/CoreService/CoreService.csproj",
+        "projectUniqueName": "C:\\Users\\chouqe\\Desktop\\stock.core\\core-service\\CoreService.csproj",
         "projectName": "CoreService",
-        "projectPath": "/home/jlwxd/Documents/core-service/CoreService/CoreService.csproj",
-        "packagesPath": "/home/jlwxd/.nuget/packages/",
-        "outputPath": "/home/jlwxd/Documents/core-service/CoreService/obj/",
+        "projectPath": "C:\\Users\\chouqe\\Desktop\\stock.core\\core-service\\CoreService.csproj",
+        "packagesPath": "C:\\Users\\chouqe\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\chouqe\\Desktop\\stock.core\\core-service\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/home/jlwxd/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\chouqe\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -38,7 +44,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.100"
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net9.0": {
@@ -104,12 +110,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[9.0.4, 9.0.4]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -118,7 +118,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.105/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
