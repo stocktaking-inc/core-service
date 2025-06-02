@@ -1,5 +1,4 @@
 ﻿.idea/
+.vs/
 
-Properties/
-bin/
-obj/
+Backup/
