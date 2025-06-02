@@ -3,6 +3,8 @@ using CoreService.Models;
 using CoreService.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace CoreService.Controllers
 {
@@ -39,22 +41,30 @@ namespace CoreService.Controllers
         public async Task<ActionResult<SupplierDTO>> GetSupplier(int id)
         {
             var supplier = await _context.Suppliers.FindAsync(id);
-
             if (supplier == null)
             {
                 return NotFound();
             }
-
             return SupplierToDTO(supplier);
         }
 
         // POST: api/suppliers
         [HttpPost]
-        public async Task<ActionResult<SupplierDTO>> PostSupplier(SupplierDTO supplierDTO)
+        public async Task<ActionResult<SupplierDTO>> PostSupplier([FromBody] SupplierDTO supplierDTO)
         {
+            if (supplierDTO == null)
+            {
+                return BadRequest("SupplierDTO is required.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var supplier = new Supplier
             {
-                Name = supplierDTO.Name,
+                Name = supplierDTO.Name ?? throw new ArgumentException("Name is required"),
                 ContactPerson = supplierDTO.ContactPerson,
                 Email = supplierDTO.Email,
                 Phone = supplierDTO.Phone,
@@ -64,16 +74,22 @@ namespace CoreService.Controllers
             _context.Suppliers.Add(supplier);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetSupplier), new { id = supplier.Id }, SupplierToDTO(supplier));
+            supplierDTO.Id = supplier.Id;
+            return CreatedAtAction(nameof(GetSupplier), new { id = supplier.Id }, supplierDTO);
         }
 
         // PUT: api/suppliers/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSupplier(int id, SupplierDTO supplierDTO)
+        public async Task<IActionResult> PutSupplier(int id, [FromBody] SupplierDTO supplierDTO)
         {
             if (id != supplierDTO.Id)
             {
-                return BadRequest();
+                return BadRequest("ID mismatch");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
 
             var supplier = await _context.Suppliers.FindAsync(id);
@@ -82,7 +98,7 @@ namespace CoreService.Controllers
                 return NotFound();
             }
 
-            supplier.Name = supplierDTO.Name;
+            supplier.Name = supplierDTO.Name ?? throw new ArgumentException("Name is required");
             supplier.ContactPerson = supplierDTO.ContactPerson;
             supplier.Email = supplierDTO.Email;
             supplier.Phone = supplierDTO.Phone;
@@ -98,10 +114,7 @@ namespace CoreService.Controllers
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
@@ -119,7 +132,6 @@ namespace CoreService.Controllers
 
             _context.Suppliers.Remove(supplier);
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
 
@@ -129,7 +141,7 @@ namespace CoreService.Controllers
         }
 
         private static SupplierDTO SupplierToDTO(Supplier supplier) =>
-            new()
+            new SupplierDTO
             {
                 Id = supplier.Id,
                 Name = supplier.Name,
