@@ -74,7 +74,7 @@ namespace CoreService.Controllers
                     return BadRequest("Количество не может быть отрицательным.");
                 }
 
-                if (itemDTO.LocationId.HasValue && !await _context.Warehouses.AnyAsync(w => w.Id == itemDTO.LocationId))
+                if (itemDTO.LocationId.HasValue && !await _context.Warehouse.AnyAsync(w => w.Id == itemDTO.LocationId))
                 {
                     return BadRequest("Недопустимый LocationId: склад не существует.");
                 }
@@ -126,7 +126,7 @@ namespace CoreService.Controllers
                 return BadRequest($"Ошибка сохранения: {ex.InnerException?.Message ?? ex.Message}");
             }
         }
-        
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutItem(int id, ItemDTO itemDTO)
         {
@@ -135,7 +135,7 @@ namespace CoreService.Controllers
                 return BadRequest("Количество не может быть отрицательным.");
             }
 
-            if (itemDTO.LocationId.HasValue && !await _context.Warehouses.AnyAsync(w => w.Id == itemDTO.LocationId))
+            if (itemDTO.LocationId.HasValue && !await _context.Warehouse.AnyAsync(w => w.Id == itemDTO.LocationId))
             {
                 return BadRequest("Недопустимый LocationId: склад не существует.");
             }
@@ -195,7 +195,7 @@ namespace CoreService.Controllers
 
             return NoContent();
         }
-        
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteItem(int id)
         {

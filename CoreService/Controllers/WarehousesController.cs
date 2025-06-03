@@ -21,7 +21,7 @@ namespace CoreService.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<WarehouseDTO>>> GetWarehouses()
         {
-            return await _context.Warehouses
+            return await _context.Warehouse
                 .Select(x => new WarehouseDTO
                 {
                     Id = x.Id,
@@ -36,7 +36,7 @@ namespace CoreService.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<WarehouseDTO>> GetWarehouse(int id)
         {
-            var warehouse = await _context.Warehouses.FindAsync(id);
+            var warehouse = await _context.Warehouse.FindAsync(id);
 
             if (warehouse == null)
             {
@@ -57,16 +57,16 @@ namespace CoreService.Controllers
                 IsActive = warehouseDTO.IsActive
             };
 
-            _context.Warehouses.Add(warehouse);
+            _context.Warehouse.Add(warehouse);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetWarehouse), new { id = warehouse.Id }, WarehouseToDTO(warehouse));
         }
-        
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutWarehouse(int id, WarehouseDTO warehouseDTO)
         {
-            var warehouse = await _context.Warehouses.FindAsync(id);
+            var warehouse = await _context.Warehouse.FindAsync(id);
             if (warehouse == null)
             {
                 return NotFound();
@@ -91,16 +91,16 @@ namespace CoreService.Controllers
 
             return NoContent();
         }
-        
+
         [HttpPatch("{id}")]
         public async Task<IActionResult> PatchWarehouse(int id, WarehouseDTO warehouseDTO)
         {
-            var warehouse = await _context.Warehouses.FindAsync(id);
+            var warehouse = await _context.Warehouse.FindAsync(id);
             if (warehouse == null)
             {
                 return NotFound();
             }
-            
+
             if (warehouseDTO.IsActive != warehouse.IsActive)
             {
                 warehouse.IsActive = warehouseDTO.IsActive;
@@ -125,23 +125,23 @@ namespace CoreService.Controllers
 
             return NoContent();
         }
-        
+
         // DELETE: api/warehouses/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteWarehouse(int id)
         {
-            var warehouse = await _context.Warehouses.FindAsync(id);
+            var warehouse = await _context.Warehouse.FindAsync(id);
             if (warehouse == null)
             {
                 return NotFound();
             }
-            
+
             if (await _context.Items.AnyAsync(i => i.LocationId == id))
             {
                 return BadRequest("Нельзя удалить склад, так как он связан с элементами в таблице items.");
             }
 
-            _context.Warehouses.Remove(warehouse);
+            _context.Warehouse.Remove(warehouse);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -149,7 +149,7 @@ namespace CoreService.Controllers
 
         private bool WarehouseExists(int id)
         {
-            return _context.Warehouses.Any(e => e.Id == id);
+            return _context.Warehouse.Any(e => e.Id == id);
         }
 
         private static WarehouseDTO WarehouseToDTO(Warehouse warehouse) =>

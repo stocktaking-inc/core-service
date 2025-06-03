@@ -6,7 +6,7 @@ namespace CoreService.DTOs;
 
 public class SupplierDTO
 {
-  public int Id { get; set; }
+  public int SupplierId { get; set; }
   public string Name { get; set; } = string.Empty;
   public string? ContactPerson { get; set; }
   public string? Email { get; set; }

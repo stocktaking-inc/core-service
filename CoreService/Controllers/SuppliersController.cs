@@ -3,8 +3,6 @@ using CoreService.Models;
 using CoreService.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
-using System.Text.Json;
 
 namespace CoreService.Controllers
 {
@@ -26,7 +24,7 @@ namespace CoreService.Controllers
             return await _context.Suppliers
                 .Select(x => new SupplierDTO
                 {
-                    Id = x.Id,
+                    SupplierId = x.Id,
                     Name = x.Name,
                     ContactPerson = x.ContactPerson,
                     Email = x.Email,
@@ -43,7 +41,7 @@ namespace CoreService.Controllers
             var supplier = await _context.Suppliers.FindAsync(id);
             if (supplier == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Поставщик не найден" });
             }
             return SupplierToDTO(supplier);
         }
@@ -54,7 +52,7 @@ namespace CoreService.Controllers
         {
             if (supplierDTO == null)
             {
-                return BadRequest("SupplierDTO is required.");
+                return BadRequest(new { message = "SupplierDTO is required." });
             }
 
             if (!ModelState.IsValid)
@@ -74,19 +72,14 @@ namespace CoreService.Controllers
             _context.Suppliers.Add(supplier);
             await _context.SaveChangesAsync();
 
-            supplierDTO.Id = supplier.Id;
+            supplierDTO.SupplierId = supplier.Id;
             return CreatedAtAction(nameof(GetSupplier), new { id = supplier.Id }, supplierDTO);
         }
 
         // PUT: api/suppliers/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSupplier(int id, [FromBody] SupplierDTO supplierDTO)
+        public async Task<IActionResult> PutSupplier(int id, SupplierDTO supplierDTO)
         {
-            if (id != supplierDTO.Id)
-            {
-                return BadRequest("ID mismatch");
-            }
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -95,7 +88,7 @@ namespace CoreService.Controllers
             var supplier = await _context.Suppliers.FindAsync(id);
             if (supplier == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Поставщик не найден" });
             }
 
             supplier.Name = supplierDTO.Name ?? throw new ArgumentException("Name is required");
@@ -112,7 +105,7 @@ namespace CoreService.Controllers
             {
                 if (!SupplierExists(id))
                 {
-                    return NotFound();
+                    return NotFound(new { message = "Поставщик не найден" });
                 }
                 throw;
             }
@@ -127,7 +120,12 @@ namespace CoreService.Controllers
             var supplier = await _context.Suppliers.FindAsync(id);
             if (supplier == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Поставщик не найден" });
+            }
+
+            if (await _context.Items.AnyAsync(i => i.SupplierId == id))
+            {
+                return BadRequest(new { message = "Нельзя удалить поставщика, так как он связан с элементами в таблице items." });
             }
 
             _context.Suppliers.Remove(supplier);
@@ -143,7 +141,7 @@ namespace CoreService.Controllers
         private static SupplierDTO SupplierToDTO(Supplier supplier) =>
             new SupplierDTO
             {
-                Id = supplier.Id,
+                SupplierId = supplier.Id,
                 Name = supplier.Name,
                 ContactPerson = supplier.ContactPerson,
                 Email = supplier.Email,

@@ -8,7 +8,7 @@ namespace CoreService.Models;
 public class Supplier
 {
   [Key]
-  [Column("id")]
+  [Column("supplier_id")]
   public int Id { get; set; }
 
   [Required]
