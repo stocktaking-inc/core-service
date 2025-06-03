@@ -14,6 +14,8 @@ public class SupplierDTO
 
   [JsonConverter(typeof(EntityStatusConverter))]
   public Supplier.EntityStatus Status { get; set; } = Supplier.EntityStatus.Active;
+
+  public List<GoodDTO> Goods { get; set; } = new(); // Добавляем список товаров
 }
 
 public class EntityStatusConverter : JsonConverter<Supplier.EntityStatus>

@@ -31,6 +31,9 @@ public class Supplier
   [Column("status")]
   public EntityStatus Status { get; set; } = EntityStatus.Active;
 
+  // Добавляем навигационное свойство для товаров
+  public ICollection<Good> Goods { get; set; } = new List<Good>();
+
   public enum EntityStatus
   {
     [PgName("active")]

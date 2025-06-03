@@ -21,29 +21,60 @@ namespace CoreService.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SupplierDTO>>> GetSuppliers()
         {
-            return await _context.Suppliers
-                .Select(x => new SupplierDTO
-                {
-                    SupplierId = x.Id,
-                    Name = x.Name,
-                    ContactPerson = x.ContactPerson,
-                    Email = x.Email,
-                    Phone = x.Phone,
-                    Status = x.Status
-                })
-                .ToListAsync();
+          return await _context.Suppliers
+            .Include(s => s.Goods) // Подгружаем связанные товары
+            .Select(s => new SupplierDTO
+            {
+              SupplierId = s.Id,
+              Name = s.Name,
+              ContactPerson = s.ContactPerson,
+              Email = s.Email,
+              Phone = s.Phone,
+              Status = s.Status,
+              Goods = s.Goods.Select(g => new GoodDTO
+              {
+                Id = g.Id,
+                Name = g.Name,
+                Article = g.Article,
+                PurchasePrice = g.PurchasePrice,
+                Category = g.Category,
+                SupplierId = g.SupplierId
+              }).ToList()
+            })
+            .ToListAsync();
         }
 
         // GET: api/suppliers/5
         [HttpGet("{id}")]
         public async Task<ActionResult<SupplierDTO>> GetSupplier(int id)
         {
-            var supplier = await _context.Suppliers.FindAsync(id);
-            if (supplier == null)
+          var supplier = await _context.Suppliers
+            .Include(s => s.Goods) // Подгружаем связанные товары
+            .FirstOrDefaultAsync(s => s.Id == id);
+
+          if (supplier == null)
+          {
+            return NotFound(new { message = "Поставщик не найден" });
+          }
+
+          return new SupplierDTO
+          {
+            SupplierId = supplier.Id,
+            Name = supplier.Name,
+            ContactPerson = supplier.ContactPerson,
+            Email = supplier.Email,
+            Phone = supplier.Phone,
+            Status = supplier.Status,
+            Goods = supplier.Goods.Select(g => new GoodDTO
             {
-                return NotFound(new { message = "Поставщик не найден" });
-            }
-            return SupplierToDTO(supplier);
+              Id = g.Id,
+              Name = g.Name,
+              Article = g.Article,
+              PurchasePrice = g.PurchasePrice,
+              Category = g.Category,
+              SupplierId = g.SupplierId
+            }).ToList()
+          };
         }
 
         // POST: api/suppliers
@@ -133,9 +164,72 @@ namespace CoreService.Controllers
             return NoContent();
         }
 
+        // POST: api/suppliers/{supplierId}/goods
+        [HttpPost("{supplierId}/goods")]
+        public async Task<ActionResult<GoodDTO>> AddGoodToSupplier(int supplierId, [FromBody] GoodDTO goodDTO)
+        {
+          if (!ModelState.IsValid)
+          {
+            return BadRequest(ModelState);
+          }
+
+          // Проверяем существование поставщика
+          if (!await _context.Suppliers.AnyAsync(s => s.Id == supplierId))
+          {
+            return NotFound(new { message = "Поставщик не найден" });
+          }
+
+          // Проверяем уникальность артикула
+          if (await _context.Goods.AnyAsync(g => g.Article == goodDTO.Article))
+          {
+            return BadRequest(new { message = "Товар с таким артикулом уже существует" });
+          }
+
+          var good = new Good
+          {
+            Name = goodDTO.Name ?? throw new ArgumentException("Name is required"),
+            Article = goodDTO.Article ?? throw new ArgumentException("Article is required"),
+            PurchasePrice = goodDTO.PurchasePrice,
+            Category = goodDTO.Category,
+            SupplierId = supplierId
+          };
+
+          _context.Goods.Add(good);
+          await _context.SaveChangesAsync();
+
+          goodDTO.Id = good.Id;
+          return CreatedAtAction(nameof(GetGood), new { id = good.Id }, goodDTO);
+        }
+
+        // GET: api/goods/{id}
+        [HttpGet("goods/{id}")]
+        public async Task<ActionResult<GoodDTO>> GetGood(int id)
+        {
+          var good = await _context.Goods.FindAsync(id);
+          if (good == null)
+          {
+            return NotFound(new { message = "Товар не найден" });
+          }
+
+          return new GoodDTO
+          {
+            Id = good.Id,
+            Name = good.Name,
+            Article = good.Article,
+            PurchasePrice = good.PurchasePrice,
+            Category = good.Category,
+            SupplierId = good.SupplierId
+          };
+        }
+
         private bool SupplierExists(int id)
         {
             return _context.Suppliers.Any(e => e.Id == id);
+        }
+
+        private bool GoodExists(int id)
+        {
+          return _context.Goods.Any(e => e.Id == id);
         }
 
         private static SupplierDTO SupplierToDTO(Supplier supplier) =>
