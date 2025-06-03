@@ -37,24 +37,21 @@ public class Item
 
   public Warehouse? Location { get; set; }
 
-  [Column("status")]
-  public StatusType Status { get; set; } = StatusType.OutOfStock;
-
   [Column("supplier")]
   public int SupplierId { get; set; }
 
   [ForeignKey("SupplierId")]
   public Supplier? Supplier { get; set; }
-  
-  public enum StatusType
-  {
-    [PgName("Out of Stock")]
-    OutOfStock = 0,
-
-    [PgName("In Stock")]
-    InStock = 1,
-
-    [PgName("Low Stock")]
-    LowStock = 2
-  }
 }
+
+// public enum ItemStatusType
+// {
+//   [PgName("Out of Stock")]
+//   OutOfStock = 0,
+//
+//   [PgName("In Stock")]
+//   InStock = 1,
+//
+//   [PgName("Low Stock")]
+//   LowStock = 2
+// }

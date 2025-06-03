@@ -22,21 +22,23 @@ namespace CoreService.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ItemDTO>>> GetItems()
         {
-            return await _context.Items
-                .AsNoTracking()
-                .Select(i => new Item
-                {
-                    Id = i.Id,
-                    Name = i.Name,
-                    Article = i.Article,
-                    Category = i.Category,
-                    Quantity = i.Quantity,
-                    LocationId = i.LocationId,
-                    SupplierId = i.SupplierId,
-                    Status = i.Status
-                })
-                .Select(x => ItemToDTO(x))
-                .ToListAsync();
+          return await _context.Items
+            .AsNoTracking()
+            .Include(i => i.Location) // Если нужно загрузить связанные данные
+            .Include(i => i.Supplier) // Если нужно загрузить связанные данные
+            .Select(i => new ItemDTO
+            {
+              Id = i.Id,
+              Name = i.Name,
+              Article = i.Article,
+              Category = i.Category,
+              Quantity = i.Quantity,
+              LocationId = i.LocationId,
+              SupplierId = i.SupplierId,
+              Status = i.Quantity <= 0 ? "Out of Stock" :
+                i.Quantity < 100 ? "Low Stock" : "In Stock"
+            })
+            .ToListAsync();
         }
 
         [HttpGet("{id}")]
@@ -44,19 +46,9 @@ namespace CoreService.Controllers
         {
             var item = await _context.Items
                 .AsNoTracking()
-                .Where(i => i.Id == id)
-                .Select(i => new Item
-                {
-                    Id = i.Id,
-                    Name = i.Name,
-                    Article = i.Article,
-                    Category = i.Category,
-                    Quantity = i.Quantity,
-                    LocationId = i.LocationId,
-                    SupplierId = i.SupplierId,
-                    Status = i.Status
-                })
-                .FirstOrDefaultAsync();
+                .Include(i => i.Location) // Если нужно загрузить связанные данные
+                .Include(i => i.Supplier) // Если нужно загрузить связанные данные
+                .FirstOrDefaultAsync(i => i.Id == id);
 
             if (item == null)
                 return NotFound();
@@ -102,11 +94,7 @@ namespace CoreService.Controllers
                 _context.Items.Add(item);
                 await _context.SaveChangesAsync();
 
-                var savedItem = await _context.Items
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(i => i.Id == item.Id);
-
-                return CreatedAtAction(nameof(GetItem), new { id = item.Id }, ItemToDTO(savedItem ?? item));
+                return CreatedAtAction(nameof(GetItem), new { id = item.Id }, ItemToDTO(item));
             }
             catch (DbUpdateException ex)
             {
@@ -225,9 +213,8 @@ namespace CoreService.Controllers
                 Category = item.Category,
                 Quantity = item.Quantity,
                 LocationId = item.LocationId,
-                Status = item.Status == Item.StatusType.InStock ? "In Stock" :
-                         item.Status == Item.StatusType.OutOfStock ? "Out of Stock" :
-                         item.Status == Item.StatusType.LowStock ? "Low Stock" : "Out of Stock",
+                Status = item.Quantity <= 0 ? "Out of Stock" :
+                         item.Quantity < 10 ? "Low Stock" : "In Stock",
                 SupplierId = item.SupplierId
             };
     }
